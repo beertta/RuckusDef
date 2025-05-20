@@ -1548,6 +1548,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 282464066}
     m_Modifications:
+    - target: {fileID: -4135575614523078846, guid: 43978a76cfb3a8a4b868d152edaf9fbb, type: 3}
+      propertyPath: speed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: -3556729406086415946, guid: 43978a76cfb3a8a4b868d152edaf9fbb, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -1813,8 +1817,8 @@ MonoBehaviour:
   - {fileID: 2346295081563125094, guid: 57b9d8e067b3ce34c96cb86816a2ed27, type: 3}
   - {fileID: 5653382657925907563, guid: bb2efb666d6d4044d8887241ba3fbf5f, type: 3}
   spawnPoint: {fileID: 1493292351}
-  spawnInterval: 10
-  totalEnemies: 5
+  spawnInterval: 2
+  totalEnemies: 30
   waypoints:
   - {fileID: 7793158969463517869, guid: 4b44349cd0782d349bd0c35443837502, type: 3}
   - {fileID: 353977092619391932, guid: 6a2c6ca5f0ef0754886955c444eddb36, type: 3}
@@ -1975,8 +1979,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8423415351245045728, guid: bb2efb666d6d4044d8887241ba3fbf5f, type: 3}
+      propertyPath: speed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8423415351245045728, guid: bb2efb666d6d4044d8887241ba3fbf5f, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2566,8 +2574,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6699744633958370819, guid: 57b9d8e067b3ce34c96cb86816a2ed27, type: 3}
+      propertyPath: speed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6699744633958370819, guid: 57b9d8e067b3ce34c96cb86816a2ed27, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -3,11 +3,13 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject[] enemyPrefabs;         // Los 4 prefabs
+    public GameObject[] enemyPrefabs;
     public Transform spawnPoint;
-    public float spawnInterval = 2f;          // Tiempo entre enemigos (en segundos)
+    public float spawnInterval = 2f;
     public int totalEnemies = 5;
     public Transform[] waypoints;
+
+    private GameObject currentEnemy;
 
     void Start()
     {
@@ -19,21 +21,27 @@ public class EnemySpawner : MonoBehaviour
     {
         for (int i = 0; i < totalEnemies; i++)
         {
+            // Esperar hasta que el enemigo anterior haya sido destruido
+            while (currentEnemy != null)
+            {
+                yield return null; // Esperar 1 frame
+            }
+
+            // Esperar un poco antes de spawnear el siguiente (opcional)
+            yield return new WaitForSeconds(spawnInterval);
+
             // Elegir un prefab aleatorio
             GameObject prefabToSpawn = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
 
-            // Instanciar el enemigo en el punto de aparición con la rotación original del prefab
-            GameObject enemy = Instantiate(prefabToSpawn, spawnPoint.position, prefabToSpawn.transform.rotation);
+            // Instanciar el enemigo
+            currentEnemy = Instantiate(prefabToSpawn, spawnPoint.position, prefabToSpawn.transform.rotation);
 
-            // Asignar waypoints si tiene movimiento
-            EnemyMovement movement = enemy.GetComponent<EnemyMovement>();
+            // Asignar waypoints
+            EnemyMovement movement = currentEnemy.GetComponent<EnemyMovement>();
             if (movement != null)
             {
                 movement.waypoints = waypoints;
             }
-
-            // Esperar antes de generar el siguiente enemigo
-            yield return new WaitForSeconds(spawnInterval);
         }
     }
 }
