@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 2501334354624758858}
   m_Layer: 0
   m_Name: Personaje_ielou
-  m_TagString: Green
+  m_TagString: Yellow
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -129,7 +129,8 @@ MonoBehaviour:
   - {fileID: 7793158969463517869, guid: 4b44349cd0782d349bd0c35443837502, type: 3}
   - {fileID: 353977092619391932, guid: 6a2c6ca5f0ef0754886955c444eddb36, type: 3}
   - {fileID: 2852468153092779065, guid: 61e338e2ff5ee894d8b8987afae4b865, type: 3}
-  speed: 2
+  speed: 5
+  animator: {fileID: 6033749448933186059}
 --- !u!114 &2501334354624758858
 MonoBehaviour:
   m_ObjectHideFlags: 0
