@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: 4590817220858736056}
   - component: {fileID: 2501334354624758858}
   m_Layer: 0
-  m_Name: Personaje_verde
+  m_Name: Personaje_ielou
   m_TagString: Green
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61,7 +61,7 @@ Transform:
   m_GameObject: {fileID: 1015512649335741131}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 12.63, y: -1.8476486, z: 25.79}
+  m_LocalPosition: {x: 22.17, y: -1.8476486, z: 25.79}
   m_LocalScale: {x: 1.6541, y: 1.6541, z: 1.6541}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -352,7 +352,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8e67bf405eabe814b9bb5abebc9013b1, type: 2}
+  - {fileID: 2100000, guid: c70ae1ac878771e42aac676472212429, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
