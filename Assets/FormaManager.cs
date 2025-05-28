@@ -29,6 +29,10 @@ public class FormaRecognizer : MonoBehaviour
                     if (Vector3.Distance(posicionJugador, waypoint.transform.position) < tolerancia)
                     {
                         progresoJugador[forma.tipo].Add(waypoint);
+
+                        // Cambiar color del waypoint tocado
+                        waypoint.ActivarVisual();
+
                         Debug.Log($"Waypoint alcanzado: {forma.tipo} - {waypoint.index}");
 
                         // Verificar si todos han sido alcanzados
@@ -54,3 +58,5 @@ public class FormaRecognizer : MonoBehaviour
         }
     }
 }
+
+
