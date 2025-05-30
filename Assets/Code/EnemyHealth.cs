@@ -12,8 +12,13 @@ public class EnemyHealth : MonoBehaviour
             // Solo destruye si el tag coincide con el propio tag (color)
             if (collision.gameObject.tag == gameObject.tag)
             {
-                Destroy(gameObject);
                 Debug.Log("Enemigo destruido, colores coinciden");
+
+                // Destruye el enemigo (este)
+                Destroy(gameObject);
+
+                // También destruye el objeto que lo golpeó
+                Destroy(collision.gameObject);
             }
             else
             {

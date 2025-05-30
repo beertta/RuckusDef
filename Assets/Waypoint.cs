@@ -49,8 +49,16 @@ public class Waypoint : MonoBehaviour
 
     public void ResetVisual()
     {
+        StartCoroutine(ResetVisualAfterDelay());
+    }
+
+    private IEnumerator ResetVisualAfterDelay()
+    {
+        yield return new WaitForSeconds(3f);
+
         if (rend != null)
             rend.material.color = colorOriginal;
+
         activado = false;
     }
 
@@ -59,6 +67,7 @@ public class Waypoint : MonoBehaviour
         return activado;
     }
 }
+
 
 
 public enum FormaType

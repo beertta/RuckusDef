@@ -38,7 +38,16 @@ public class FormaRecognizer : MonoBehaviour
             forma.completada = true;
             InstanciarObjeto(forma);
 
-            // Desactivar las formas en pantalla cuando se complete una
+            // Reiniciar los waypoints para volver a usar la forma en el futuro
+            foreach (var wp in forma.waypoints)
+            {
+                wp.ResetVisual();
+            }
+
+            // Marcar como incompleta para volver a activarla en el futuro
+            forma.completada = false;
+
+            // Desactivar el prefab de forma en pantalla
             if (enemySpawner != null)
                 enemySpawner.DesactivarFormas();
         }
