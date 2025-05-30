@@ -4,6 +4,7 @@ using UnityEngine;
 public class FormaRecognizer : MonoBehaviour
 {
     public List<Forma> formas;
+    public EnemySpawner enemySpawner;  // Asignar en inspector
 
     void Start()
     {
@@ -22,11 +23,10 @@ public class FormaRecognizer : MonoBehaviour
     {
         if (forma.completada) return;
 
-        // Verificar si todos los waypoints están activados (esfera verde)
         bool todosActivados = true;
         foreach (var wp in forma.waypoints)
         {
-            if (!wpIsActivado(wp))
+            if (!wp.IsActivado())
             {
                 todosActivados = false;
                 break;
@@ -37,20 +37,11 @@ public class FormaRecognizer : MonoBehaviour
         {
             forma.completada = true;
             InstanciarObjeto(forma);
+
+            // Desactivar las formas en pantalla cuando se complete una
+            if (enemySpawner != null)
+                enemySpawner.DesactivarFormas();
         }
-    }
-
-    // Método para saber si un waypoint está activado (puedes hacerlo público en Waypoint para mejor acceso)
-    private bool wpIsActivado(Waypoint wp)
-    {
-        // Acceso directo a bool activado no permitido? Si no, puedes crear getter en Waypoint
-        return wp != null && wpIsActivadoGetter(wp);
-    }
-
-    private bool wpIsActivadoGetter(Waypoint wp)
-    {
-        // Aquí asumiremos que Waypoint tiene un método público IsActivado
-        return wp.IsActivado();
     }
 
     void InstanciarObjeto(Forma forma)

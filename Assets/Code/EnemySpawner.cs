@@ -2,13 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class EnemyFormMapping
-{
-    public string colorName; // Ejemplo: "Yellow", "Red", "Blue", "Green"
-    public FormaType forma;  // Tipo de forma asignada a ese color
-}
-
 public class EnemySpawner : MonoBehaviour
 {
     [Header("Prefabs por color (3 por grupo)")]
@@ -17,8 +10,11 @@ public class EnemySpawner : MonoBehaviour
     public GameObject[] blueEnemies;
     public GameObject[] greenEnemies;
 
-    [Header("Mapeo Color - Forma")]
-    public List<EnemyFormMapping> enemyFormMappings;
+    [Header("Formas en escena (prefabs desactivados por defecto)")]
+    public GameObject formaCuadrado;   // Se activa para Blue
+    public GameObject formaCirculo;    // Se activa para Yellow
+    public GameObject formaTriangulo;  // Se activa para Red
+    public GameObject formaRombo;      // Se activa para Green
 
     public Transform spawnPoint;
     public float spawnInterval = 2f;
@@ -32,8 +28,6 @@ public class EnemySpawner : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Spawn Interval actual: " + spawnInterval + " segundos");
-
         enemyGroups = new Dictionary<string, GameObject[]>()
         {
             { "Yellow", yellowEnemies },
@@ -41,6 +35,12 @@ public class EnemySpawner : MonoBehaviour
             { "Blue", blueEnemies },
             { "Green", greenEnemies }
         };
+
+        // Asegurarse que todas las formas estén desactivadas al inicio
+        if (formaCuadrado != null) formaCuadrado.SetActive(false);
+        if (formaCirculo != null) formaCirculo.SetActive(false);
+        if (formaTriangulo != null) formaTriangulo.SetActive(false);
+        if (formaRombo != null) formaRombo.SetActive(false);
 
         StartCoroutine(SpawnEnemies());
     }
@@ -65,28 +65,47 @@ public class EnemySpawner : MonoBehaviour
 
             currentEnemy = Instantiate(prefabToSpawn, spawnPoint.position, prefabToSpawn.transform.rotation);
 
-            // Asignar waypoints
+            // Asignar waypoints al enemigo
             EnemyMovement movement = currentEnemy.GetComponent<EnemyMovement>();
             if (movement != null)
                 movement.waypoints = waypoints;
 
-            // Buscar la forma asignada para el color seleccionado
-            FormaType formaAsignada = FormaType.Cuadrado; // Valor por defecto
-            foreach (var mapping in enemyFormMappings)
-            {
-                if (mapping.colorName == selectedColor)
-                {
-                    formaAsignada = mapping.forma;
-                    break;
-                }
-            }
-
-            // Pasar la forma al enemigo (si tiene el componente EnemyForma)
-            EnemyForma enemyForma = currentEnemy.GetComponent<EnemyForma>();
-            if (enemyForma != null)
-            {
-                enemyForma.SetForma(formaAsignada);
-            }
+            // Activar la forma correspondiente según color
+            ActivarFormaPorColor(selectedColor);
         }
+    }
+
+    private void ActivarFormaPorColor(string color)
+    {
+        // Primero desactivar todas
+        if (formaCuadrado != null) formaCuadrado.SetActive(false);
+        if (formaCirculo != null) formaCirculo.SetActive(false);
+        if (formaTriangulo != null) formaTriangulo.SetActive(false);
+        if (formaRombo != null) formaRombo.SetActive(false);
+
+        switch (color)
+        {
+            case "Blue":
+                if (formaCuadrado != null) formaCuadrado.SetActive(true);
+                break;
+            case "Yellow":
+                if (formaCirculo != null) formaCirculo.SetActive(true);
+                break;
+            case "Red":
+                if (formaTriangulo != null) formaTriangulo.SetActive(true);
+                break;
+            case "Green":
+                if (formaRombo != null) formaRombo.SetActive(true);
+                break;
+        }
+    }
+
+    // Método público para desactivar todas las formas (llámalo cuando se instancie el arma)
+    public void DesactivarFormas()
+    {
+        if (formaCuadrado != null) formaCuadrado.SetActive(false);
+        if (formaCirculo != null) formaCirculo.SetActive(false);
+        if (formaTriangulo != null) formaTriangulo.SetActive(false);
+        if (formaRombo != null) formaRombo.SetActive(false);
     }
 }
