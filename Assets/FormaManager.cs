@@ -4,49 +4,53 @@ using UnityEngine;
 public class FormaRecognizer : MonoBehaviour
 {
     public List<Forma> formas;
-    private Dictionary<FormaType, List<Waypoint>> progresoJugador = new Dictionary<FormaType, List<Waypoint>>();
-
-    public float tolerancia = 0.2f; // Distancia mínima para considerar que tocó un waypoint
 
     void Start()
     {
         foreach (var forma in formas)
         {
-            progresoJugador[forma.tipo] = new List<Waypoint>();
+            forma.completada = false;
+            foreach (var waypoint in forma.waypoints)
+            {
+                waypoint.OnWaypointActivado += (wp) => OnWaypointActivado(forma);
+                waypoint.ResetVisual();
+            }
         }
     }
 
-    public void VerificarWaypoint(Vector3 posicionJugador)
+    private void OnWaypointActivado(Forma forma)
     {
-        foreach (var forma in formas)
+        if (forma.completada) return;
+
+        // Verificar si todos los waypoints están activados (esfera verde)
+        bool todosActivados = true;
+        foreach (var wp in forma.waypoints)
         {
-            if (forma.completada) continue;
-
-            foreach (var waypoint in forma.waypoints)
+            if (!wpIsActivado(wp))
             {
-                if (!progresoJugador[forma.tipo].Contains(waypoint))
-                {
-                    if (Vector3.Distance(posicionJugador, waypoint.transform.position) < tolerancia)
-                    {
-                        progresoJugador[forma.tipo].Add(waypoint);
-
-                        // Cambiar color del waypoint tocado
-                        waypoint.ActivarVisual();
-
-                        Debug.Log($"Waypoint alcanzado: {forma.tipo} - {waypoint.index}");
-
-                        // Verificar si todos han sido alcanzados
-                        if (progresoJugador[forma.tipo].Count == forma.waypoints.Count)
-                        {
-                            forma.completada = true;
-                            InstanciarObjeto(forma);
-                        }
-
-                        return;
-                    }
-                }
+                todosActivados = false;
+                break;
             }
         }
+
+        if (todosActivados)
+        {
+            forma.completada = true;
+            InstanciarObjeto(forma);
+        }
+    }
+
+    // Método para saber si un waypoint está activado (puedes hacerlo público en Waypoint para mejor acceso)
+    private bool wpIsActivado(Waypoint wp)
+    {
+        // Acceso directo a bool activado no permitido? Si no, puedes crear getter en Waypoint
+        return wp != null && wpIsActivadoGetter(wp);
+    }
+
+    private bool wpIsActivadoGetter(Waypoint wp)
+    {
+        // Aquí asumiremos que Waypoint tiene un método público IsActivado
+        return wp.IsActivado();
     }
 
     void InstanciarObjeto(Forma forma)
@@ -58,5 +62,3 @@ public class FormaRecognizer : MonoBehaviour
         }
     }
 }
-
-
