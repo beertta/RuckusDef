@@ -37,7 +37,6 @@ public class EnemySpawner : MonoBehaviour
             { "Green", greenEnemies }
         };
 
-        // Asegurarse que todas las formas estén desactivadas al inicio
         DesactivarFormas();
 
         StartCoroutine(RunGamePhases());
@@ -45,7 +44,7 @@ public class EnemySpawner : MonoBehaviour
 
     IEnumerator RunGamePhases()
     {
-        // --- ROUND 1 ---
+        // ROUND 1
         List<string> round1Colors = new List<string>() { "Red", "Green", "Blue", "Yellow" };
 
         foreach (string color in round1Colors)
@@ -69,8 +68,8 @@ public class EnemySpawner : MonoBehaviour
             ActivarFormaPorColor(color);
         }
 
-        // --- ROUND 2 ---
-        for (int i = 0; i < 2; i++)
+        // ROUND 2
+        for (int i = 0; i < 1; i++)
         {
             while (currentEnemy != null)
                 yield return null;
@@ -97,7 +96,7 @@ public class EnemySpawner : MonoBehaviour
             ActivarFormaPorColor(selectedColor);
         }
 
-        // --- FINAL BOSS ---
+        // FINAL BOSS
         while (currentEnemy != null)
             yield return null;
 
@@ -116,8 +115,9 @@ public class EnemySpawner : MonoBehaviour
         FinalBoss bossScript = currentEnemy.GetComponent<FinalBoss>();
         if (bossScript != null)
         {
-            bossScript.spawner = this; // para que pueda activar formas
+            bossScript.spawner = this;
             bossScript.IniciarBoss();
+            Debug.Log("FinalBoss instanciado y secuencia iniciada.");
         }
     }
 

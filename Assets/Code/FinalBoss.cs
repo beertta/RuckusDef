@@ -26,14 +26,33 @@ public class FinalBoss : MonoBehaviour
 
     void Start()
     {
-        colorToMaterial = new Dictionary<string, Material>
+        if (bossRenderer == null)
         {
-            { "Red", redMaterial },
-            { "Green", greenMaterial },
-            { "Blue", blueMaterial },
-            { "Yellow", yellowMaterial }
-        };
+            bossRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+            if (bossRenderer == null)
+            {
+                Debug.LogError("No se encontró SkinnedMeshRenderer en FinalBoss ni hijos.");
+            }
+            else
+            {
+                Debug.Log("SkinnedMeshRenderer asignado automáticamente en FinalBoss.");
+            }
+        }
+
+        colorToMaterial = new Dictionary<string, Material>
+    {
+        { "Red", redMaterial },
+        { "Green", greenMaterial },
+        { "Blue", blueMaterial },
+        { "Yellow", yellowMaterial }
+    };
+
+        if (colorSequence == null || colorSequence.Count == 0)
+        {
+            IniciarBoss();
+        }
     }
+
 
     public void IniciarBoss()
     {
@@ -41,12 +60,22 @@ public class FinalBoss : MonoBehaviour
         Shuffle(colorSequence);
         currentColorIndex = 0;
         AplicarColorActual();
+        Debug.Log("FinalBoss iniciado con secuencia de colores.");
     }
 
     void AplicarColorActual()
     {
         string color = colorSequence[currentColorIndex];
-        bossRenderer.material = colorToMaterial[color];
+        if (colorToMaterial.TryGetValue(color, out Material mat) && bossRenderer != null)
+        {
+            bossRenderer.material = mat;
+            Debug.Log($"FinalBoss color aplicado: {color}");
+        }
+        else
+        {
+            Debug.LogWarning("Material o Renderer no asignado en FinalBoss.");
+        }
+
         spawner?.ActivarFormaPorColor(color);
         gameObject.tag = color; // Para que el arma correcta pueda detectarlo
     }
@@ -54,10 +83,9 @@ public class FinalBoss : MonoBehaviour
     void SiguienteColor()
     {
         currentColorIndex++;
-
         if (currentColorIndex >= colorSequence.Count)
         {
-            // Muerte del jefe
+            Debug.Log("FinalBoss muerto, secuencia completada.");
             StartCoroutine(DeathSequence());
         }
         else
