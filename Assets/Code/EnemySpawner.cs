@@ -9,7 +9,10 @@ public class EnemySpawner : MonoBehaviour
     public GameObject[] redEnemies;
     public GameObject[] blueEnemies;
     public GameObject[] greenEnemies;
-    public GameObject finalBossPrefab;
+
+    [Header("Final Boss")]
+    public GameObject[] bossMoviendoPrefabs; // Prefabs con caminar+idle
+    public GameObject[] bossIdleSoloPrefabs; // Prefabs solo idle
 
     [Header("Formas en escena")]
     public GameObject formaCuadrado;
@@ -30,6 +33,9 @@ public class EnemySpawner : MonoBehaviour
     private string lastColor = "";
     private Dictionary<string, GameObject[]> enemyGroups;
     private List<string> allColors = new List<string>() { "Red", "Green", "Blue", "Yellow" };
+
+    private string finalBossColor = "";
+    private int idleBossCount = 0;
 
     void Start()
     {
@@ -85,7 +91,6 @@ public class EnemySpawner : MonoBehaviour
 
         // FINAL BOSS
         yield return StartCoroutine(ActivarPanelYEsperar(finalBossPanel));
-
         yield return EsperarHastaQueNoHayaEnemigo();
         yield return new WaitForSeconds(spawnInterval);
 
@@ -99,9 +104,7 @@ public class EnemySpawner : MonoBehaviour
             panel.SetActive(true);
             CanvasGroup cg = panel.GetComponent<CanvasGroup>();
             if (cg != null)
-            {
                 yield return StartCoroutine(FadeCanvasGroup(cg, 0f, 1f, 0.5f));
-            }
         }
 
         yield return new WaitForSeconds(4f);
@@ -110,9 +113,8 @@ public class EnemySpawner : MonoBehaviour
         {
             CanvasGroup cg = panel.GetComponent<CanvasGroup>();
             if (cg != null)
-            {
                 yield return StartCoroutine(FadeCanvasGroup(cg, 1f, 0f, 0.5f));
-            }
+
             panel.SetActive(false);
         }
     }
@@ -134,28 +136,97 @@ public class EnemySpawner : MonoBehaviour
         GameObject prefab = GetRandomPrefab(color);
         Quaternion rot = CalcularRotacionInicial();
         currentEnemy = Instantiate(prefab, spawnPoint.position, rot);
-        AssignWaypoints(currentEnemy);
+
+        // Asigna waypoints y spawner solo si tiene EnemyMovement y/o FinalBoss
+        AssignComponents(currentEnemy);
+
         ActivarFormaPorColor(color);
     }
 
     void SpawnFinalBoss()
     {
-        Quaternion rot = CalcularRotacionInicial();
-        currentEnemy = Instantiate(finalBossPrefab, spawnPoint.position, rot);
-        AssignWaypoints(currentEnemy);
+        // Elegir prefab movible al azar
+        GameObject bossMov = bossMoviendoPrefabs[Random.Range(0, bossMoviendoPrefabs.Length)];
+        finalBossColor = bossMov.tag;
 
-        FinalBoss bossScript = currentEnemy.GetComponent<FinalBoss>();
-        if (bossScript != null)
+        Quaternion rot = CalcularRotacionInicial();
+        currentEnemy = Instantiate(bossMov, spawnPoint.position, rot);
+
+        AssignComponents(currentEnemy);
+
+        // Configurar FinalBoss
+        FinalBoss fb = currentEnemy.GetComponent<FinalBoss>();
+        if (fb != null)
         {
-            bossScript.spawner = this;
-            bossScript.IniciarBoss();
+            fb.esPrimerBoss = true;
+            fb.spawner = this;
+            fb.IniciarBoss();
         }
+
+        ActivarFormaPorColor(finalBossColor);
+    }
+
+    public void OnFinalBossKilled(string killedColor)
+    {
+        if (idleBossCount >= 3)
+        {
+            Debug.Log("Todos los Final Boss han sido derrotados. ¡Victoria!");
+            ReiniciarPartida();
+            return;
+        }
+
+        List<string> disponibles = new List<string>(allColors);
+        disponibles.Remove(finalBossColor);
+
+        string siguienteColor = disponibles[idleBossCount];
+        GameObject siguienteBoss = GetIdleBossPrefabByColor(siguienteColor);
+
+        Vector3 spawnPos = waypoints[2].position + new Vector3(0, 0, -idleBossCount * 2);
+        currentEnemy = Instantiate(siguienteBoss, spawnPos, Quaternion.identity);
+
+        AssignComponents(currentEnemy);
+
+        FinalBoss fb = currentEnemy.GetComponent<FinalBoss>();
+        if (fb != null)
+        {
+            fb.esPrimerBoss = false;
+            fb.spawner = this;
+            fb.IniciarBoss();
+        }
+
+        ActivarFormaPorColor(siguienteColor);
+        idleBossCount++;
+    }
+
+    void AssignComponents(GameObject enemy)
+    {
+        // Asignar waypoints si tiene EnemyMovement
+        EnemyMovement movement = enemy.GetComponent<EnemyMovement>();
+        if (movement != null)
+            movement.waypoints = waypoints;
+
+        // Asignar spawner si tiene FinalBoss
+        FinalBoss fb = enemy.GetComponent<FinalBoss>();
+        if (fb != null)
+            fb.spawner = this;
     }
 
     GameObject GetRandomPrefab(string color)
     {
         GameObject[] group = enemyGroups[color];
         return group[Random.Range(0, group.Length)];
+    }
+
+    GameObject GetIdleBossPrefabByColor(string color)
+    {
+        foreach (GameObject boss in bossIdleSoloPrefabs)
+        {
+            if (boss.CompareTag(color))
+                return boss;
+        }
+
+        Debug.LogError($"No se encontró prefab idle para el color: {color}");
+        return null;
     }
 
     Quaternion CalcularRotacionInicial()
@@ -177,13 +248,6 @@ public class EnemySpawner : MonoBehaviour
     public void OnEnemyDestroyed()
     {
         currentEnemy = null;
-    }
-
-    void AssignWaypoints(GameObject enemy)
-    {
-        EnemyMovement movement = enemy.GetComponent<EnemyMovement>();
-        if (movement != null)
-            movement.waypoints = waypoints;
     }
 
     public void ActivarFormaPorColor(string color)
@@ -213,7 +277,6 @@ public class EnemySpawner : MonoBehaviour
         if (finalBossPanel != null) finalBossPanel.SetActive(false);
     }
 
-    // MÉTODO DE REINICIO TOTAL
     public void ReiniciarPartida()
     {
         StopAllCoroutines();
@@ -226,18 +289,17 @@ public class EnemySpawner : MonoBehaviour
             currentEnemy = null;
         }
 
-        // Destruir enemigos de todos los colores
         string[] tags = { "Red", "Green", "Blue", "Yellow" };
         foreach (string tag in tags)
         {
             GameObject[] enemigos = GameObject.FindGameObjectsWithTag(tag);
             foreach (GameObject enemigo in enemigos)
-            {
                 Destroy(enemigo);
-            }
         }
 
         lastColor = "";
+        finalBossColor = "";
+        idleBossCount = 0;
 
         StartCoroutine(RunGamePhases());
     }
