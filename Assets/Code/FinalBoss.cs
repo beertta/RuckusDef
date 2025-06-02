@@ -56,11 +56,20 @@ public class FinalBoss : MonoBehaviour
 
     public void IniciarBoss()
     {
+        // Primer color fijo (por ejemplo "Red")
         colorSequence = new List<string> { "Red", "Green", "Blue", "Yellow" };
-        Shuffle(colorSequence);
+
+        // Barajamos solo los colores a partir del índice 1 (sin tocar el primero)
+        List<string> subList = colorSequence.GetRange(1, colorSequence.Count - 1);
+        Shuffle(subList);
+
+        // Volvemos a colocar el rojo fijo al inicio
+        colorSequence = new List<string> { "Red" };
+        colorSequence.AddRange(subList);
+
         currentColorIndex = 0;
         AplicarColorActual();
-        Debug.Log("FinalBoss iniciado con secuencia de colores.");
+        Debug.Log("FinalBoss iniciado con color inicial fijo y resto aleatorio.");
     }
 
     void AplicarColorActual()
