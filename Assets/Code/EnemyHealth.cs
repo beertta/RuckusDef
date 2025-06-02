@@ -30,6 +30,12 @@ public class EnemyHealth : MonoBehaviour
                     Destroy(onDeathParticles.gameObject, effectDuration);
                 }
 
+                // AVISA a la barra de vida que un enemigo atacando murió
+                if (BarraDeVida.Instance != null)
+                {
+                    BarraDeVida.Instance.EnemigoAtacandoMuerto();
+                }
+
                 // Destruye el enemigo inmediatamente
                 Destroy(gameObject);
             }

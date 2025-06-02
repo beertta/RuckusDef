@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class EnemyMovement : MonoBehaviour
 {
@@ -9,13 +8,14 @@ public class EnemyMovement : MonoBehaviour
     public float speed = 2f;
     public Animator animator;
 
+    public static event Action OnEnemigoLlegoAlFinal; // Evento estático
+
     void Update()
     {
         if (waypoints == null || waypoints.Length == 0) return;
 
         if (currentWaypointIndex >= waypoints.Length)
         {
-            // Ya llegó al final, cambiar a animación de idle
             animator.SetBool("isWalking", false);
             return;
         }
@@ -23,11 +23,16 @@ public class EnemyMovement : MonoBehaviour
         Transform target = waypoints[currentWaypointIndex];
         transform.position = Vector3.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
 
-        animator.SetBool("isWalking", true); // Asegúrate de estar caminando
+        animator.SetBool("isWalking", true);
 
         if (Vector3.Distance(transform.position, target.position) < 0.1f)
         {
             currentWaypointIndex++;
+
+            if (currentWaypointIndex >= waypoints.Length)
+            {
+                OnEnemigoLlegoAlFinal?.Invoke(); // Notificar
+            }
         }
     }
 }
