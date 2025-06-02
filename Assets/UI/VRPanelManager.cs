@@ -12,7 +12,7 @@ public class VRPanelManager : MonoBehaviour
     public TextMeshProUGUI countdownText2;
     public TextMeshProUGUI countdownText3;
 
-    public EnemySpawner enemySpawner; // Asignar desde el inspector
+    public EnemySpawner enemySpawner; // Asignar en Inspector
 
     void Start()
     {
@@ -38,8 +38,15 @@ public class VRPanelManager : MonoBehaviour
         yield return StartCoroutine(Countdown(10, countdownText3));
         panel3.SetActive(false);
 
-        // Iniciar el juego
-        StartGame();
+        // Iniciar el juego (spawner)
+        if (enemySpawner != null)
+        {
+            enemySpawner.StartSpawning();
+        }
+        else
+        {
+            Debug.LogError("EnemySpawner no está asignado en el Inspector.");
+        }
     }
 
     IEnumerator Countdown(int seconds, TextMeshProUGUI textElement)
@@ -49,23 +56,6 @@ public class VRPanelManager : MonoBehaviour
             textElement.text = i.ToString();
             yield return new WaitForSeconds(1f);
         }
-        textElement.text = ""; // Limpia al final si quieres
-    }
-
-    void StartGame()
-    {
-        Debug.Log("¡Empieza el juego!");
-
-        // Iniciar la generación de enemigos
-        if (enemySpawner != null)
-        {
-            StartCoroutine(enemySpawner.RunGamePhases());
-        }
-        else
-        {
-            Debug.LogError("EnemySpawner no está asignado en el Inspector.");
-        }
-
-        // Aquí puedes añadir lógica adicional para iniciar el juego en VR
+        textElement.text = "";
     }
 }
