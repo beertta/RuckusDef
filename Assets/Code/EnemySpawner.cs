@@ -39,10 +39,10 @@ public class EnemySpawner : MonoBehaviour
 
         DesactivarFormas();
 
-        StartCoroutine(RunGamePhases());
+        // La coroutine se iniciará desde VRPanelManager
     }
 
-    IEnumerator RunGamePhases()
+    public IEnumerator RunGamePhases()
     {
         // ROUND 1
         List<string> round1Colors = new List<string>() { "Red", "Green", "Blue", "Yellow" };
