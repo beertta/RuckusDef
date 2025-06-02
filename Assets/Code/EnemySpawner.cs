@@ -9,6 +9,7 @@ public class EnemySpawner : MonoBehaviour
     public GameObject[] redEnemies;
     public GameObject[] blueEnemies;
     public GameObject[] greenEnemies;
+    public GameObject finalBossPrefab;
 
     [Header("Formas en escena (prefabs desactivados por defecto)")]
     public GameObject formaCuadrado;   // Se activa para Blue
@@ -18,13 +19,13 @@ public class EnemySpawner : MonoBehaviour
 
     public Transform spawnPoint;
     public float spawnInterval = 2f;
-    public int totalEnemies = 5;
     public Transform[] waypoints;
 
     private GameObject currentEnemy;
     private string lastColor = "";
 
     private Dictionary<string, GameObject[]> enemyGroups;
+    private List<string> allColors = new List<string>() { "Red", "Green", "Blue", "Yellow" };
 
     void Start()
     {
@@ -37,51 +38,105 @@ public class EnemySpawner : MonoBehaviour
         };
 
         // Asegurarse que todas las formas estén desactivadas al inicio
-        if (formaCuadrado != null) formaCuadrado.SetActive(false);
-        if (formaCirculo != null) formaCirculo.SetActive(false);
-        if (formaTriangulo != null) formaTriangulo.SetActive(false);
-        if (formaRombo != null) formaRombo.SetActive(false);
+        DesactivarFormas();
 
-        StartCoroutine(SpawnEnemies());
+        StartCoroutine(RunGamePhases());
     }
 
-    IEnumerator SpawnEnemies()
+    IEnumerator RunGamePhases()
     {
-        for (int i = 0; i < totalEnemies; i++)
+        // --- ROUND 1 ---
+        List<string> round1Colors = new List<string>() { "Red", "Green", "Blue", "Yellow" };
+
+        foreach (string color in round1Colors)
         {
             while (currentEnemy != null)
                 yield return null;
 
             yield return new WaitForSeconds(spawnInterval);
 
-            List<string> availableColors = new List<string>(enemyGroups.Keys);
+            GameObject prefab = GetRandomPrefab(color);
+
+            Quaternion lookRotation = Quaternion.identity;
+            if (waypoints != null && waypoints.Length > 0)
+            {
+                Vector3 lookTarget = waypoints[0].position;
+                lookRotation = Quaternion.LookRotation(lookTarget - spawnPoint.position) * Quaternion.Euler(0, 270, 0);
+            }
+
+            currentEnemy = Instantiate(prefab, spawnPoint.position, lookRotation);
+            AssignWaypoints(currentEnemy);
+            ActivarFormaPorColor(color);
+        }
+
+        // --- ROUND 2 ---
+        for (int i = 0; i < 2; i++)
+        {
+            while (currentEnemy != null)
+                yield return null;
+
+            yield return new WaitForSeconds(spawnInterval);
+
+            List<string> availableColors = new List<string>(allColors);
             availableColors.Remove(lastColor);
 
             string selectedColor = availableColors[Random.Range(0, availableColors.Count)];
             lastColor = selectedColor;
 
-            GameObject[] selectedGroup = enemyGroups[selectedColor];
-            GameObject prefabToSpawn = selectedGroup[Random.Range(0, selectedGroup.Length)];
+            GameObject prefab = GetRandomPrefab(selectedColor);
 
-            currentEnemy = Instantiate(prefabToSpawn, spawnPoint.position, prefabToSpawn.transform.rotation);
+            Quaternion lookRotation = Quaternion.identity;
+            if (waypoints != null && waypoints.Length > 0)
+            {
+                Vector3 lookTarget = waypoints[0].position;
+                lookRotation = Quaternion.LookRotation(lookTarget - spawnPoint.position) * Quaternion.Euler(0, 270, 0);
+            }
 
-            // Asignar waypoints al enemigo
-            EnemyMovement movement = currentEnemy.GetComponent<EnemyMovement>();
-            if (movement != null)
-                movement.waypoints = waypoints;
-
-            // Activar la forma correspondiente según color
+            currentEnemy = Instantiate(prefab, spawnPoint.position, lookRotation);
+            AssignWaypoints(currentEnemy);
             ActivarFormaPorColor(selectedColor);
+        }
+
+        // --- FINAL BOSS ---
+        while (currentEnemy != null)
+            yield return null;
+
+        yield return new WaitForSeconds(spawnInterval);
+
+        Quaternion bossLookRotation = Quaternion.identity;
+        if (waypoints != null && waypoints.Length > 0)
+        {
+            Vector3 lookTarget = waypoints[0].position;
+            bossLookRotation = Quaternion.LookRotation(lookTarget - spawnPoint.position) * Quaternion.Euler(0, 270, 0);
+        }
+
+        currentEnemy = Instantiate(finalBossPrefab, spawnPoint.position, bossLookRotation);
+        AssignWaypoints(currentEnemy);
+
+        FinalBoss bossScript = currentEnemy.GetComponent<FinalBoss>();
+        if (bossScript != null)
+        {
+            bossScript.spawner = this; // para que pueda activar formas
+            bossScript.IniciarBoss();
         }
     }
 
-    private void ActivarFormaPorColor(string color)
+    GameObject GetRandomPrefab(string color)
     {
-        // Primero desactivar todas
-        if (formaCuadrado != null) formaCuadrado.SetActive(false);
-        if (formaCirculo != null) formaCirculo.SetActive(false);
-        if (formaTriangulo != null) formaTriangulo.SetActive(false);
-        if (formaRombo != null) formaRombo.SetActive(false);
+        GameObject[] group = enemyGroups[color];
+        return group[Random.Range(0, group.Length)];
+    }
+
+    void AssignWaypoints(GameObject enemy)
+    {
+        EnemyMovement movement = enemy.GetComponent<EnemyMovement>();
+        if (movement != null)
+            movement.waypoints = waypoints;
+    }
+
+    public void ActivarFormaPorColor(string color)
+    {
+        DesactivarFormas();
 
         switch (color)
         {
@@ -100,12 +155,16 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    // Método público para desactivar todas las formas (llámalo cuando se instancie el arma)
     public void DesactivarFormas()
     {
         if (formaCuadrado != null) formaCuadrado.SetActive(false);
         if (formaCirculo != null) formaCirculo.SetActive(false);
         if (formaTriangulo != null) formaTriangulo.SetActive(false);
         if (formaRombo != null) formaRombo.SetActive(false);
+    }
+
+    public void OnEnemyDestroyed()
+    {
+        currentEnemy = null;
     }
 }
