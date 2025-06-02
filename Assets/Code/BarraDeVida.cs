@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,10 +24,6 @@ public class BarraDeVida : MonoBehaviour
     public float tiempoEsperaRonda2 = 2.5f;
     public float tiempoEsperaRonda3 = 1f;
 
-    [Header("Porcentaje de daño que se suma si se mata enemigo antes de que empiece a bajar la vida")]
-    [Range(0f, 1f)]
-    public float porcentajeVidaPorMatarEnemigo = 0.1f;
-
     [Header("Ronda actual (1 a 3)")]
     public int rondaActual = 1;
 
@@ -37,6 +34,8 @@ public class BarraDeVida : MonoBehaviour
     private Coroutine rutinaReducirVida;
     private bool esperandoReducirVida = false;
     private bool reduccionPausada = true;
+
+    private List<EnemigoEnEspera> enemigosEnEspera = new List<EnemigoEnEspera>();
 
     void Start()
     {
@@ -73,18 +72,11 @@ public class BarraDeVida : MonoBehaviour
     {
         esperandoReducirVida = true;
 
-        float tiempoEspera = tiempoEsperaRonda1;
-        switch (rondaActual)
-        {
-            case 1: tiempoEspera = tiempoEsperaRonda1; break;
-            case 2: tiempoEspera = tiempoEsperaRonda2; break;
-            case 3: tiempoEspera = tiempoEsperaRonda3; break;
-        }
-
+        float tiempoEspera = GetTiempoEsperaRonda();
         yield return new WaitForSeconds(tiempoEspera);
 
         esperandoReducirVida = false;
-        reduccionPausada = false; // Reanudamos la reducción
+        reduccionPausada = false;
     }
 
     IEnumerator ReducirVida()
@@ -97,15 +89,8 @@ public class BarraDeVida : MonoBehaviour
                 continue;
             }
 
-            float dañoPorSegundo = dañoRonda1;
-            switch (rondaActual)
-            {
-                case 1: dañoPorSegundo = dañoRonda1; break;
-                case 2: dañoPorSegundo = dañoRonda2; break;
-                case 3: dañoPorSegundo = dañoRonda3; break;
-            }
-
-            vidaActual -= dañoPorSegundo;
+            float daño = GetDañoRonda();
+            vidaActual -= daño;
             vidaActual = Mathf.Clamp(vidaActual, 0f, vidaMaxima);
             ActualizarBarra();
 
@@ -115,14 +100,8 @@ public class BarraDeVida : MonoBehaviour
                 yield break;
             }
 
-            float tiempoReal = tiempoBaseReduccion;
-            switch (rondaActual)
-            {
-                case 2: tiempoReal /= 2f; break;
-                case 3: tiempoReal /= 5f; break;
-            }
-
-            yield return new WaitForSeconds(tiempoReal);
+            float tiempo = GetTiempoReduccion();
+            yield return new WaitForSeconds(tiempo);
         }
     }
 
@@ -134,34 +113,79 @@ public class BarraDeVida : MonoBehaviour
         }
     }
 
-    // Llamar cuando un enemigo muere antes de llegar al último waypoint
-    public void EnemigoMuertoAntesDeAtacar()
+    //  Este lo llama el enemigo al instanciarse (por ejemplo en Start del enemigo)
+    public void RegistrarEnemigoEnEspera(GameObject enemigo)
     {
-        if (!esperandoReducirVida && !reduccionPausada && vidaActual < vidaMaxima)
-        {
-            float dañoPorSegundo = dañoRonda1;
-            switch (rondaActual)
-            {
-                case 1: dañoPorSegundo = dañoRonda1; break;
-                case 2: dañoPorSegundo = dañoRonda2; break;
-                case 3: dañoPorSegundo = dañoRonda3; break;
-            }
+        float tiempo = GetTiempoEsperaRonda();
+        enemigosEnEspera.Add(new EnemigoEnEspera(enemigo, Time.time + tiempo));
+    }
 
-            float incremento = dañoPorSegundo * porcentajeVidaPorMatarEnemigo;
-            vidaActual += incremento;
+    // Este lo llama el enemigo cuando muere antes de atacar
+    public void EnemigoMuertoAntesDeAtacar(GameObject enemigo)
+    {
+        var item = enemigosEnEspera.Find(e => e.enemigo == enemigo);
+        if (item != null && Time.time < item.expiraEn)
+        {
+            float cantidad = GetDañoRonda();
+            vidaActual += cantidad;
             vidaActual = Mathf.Clamp(vidaActual, 0f, vidaMaxima);
             ActualizarBarra();
+            enemigosEnEspera.Remove(item);
         }
     }
 
-    // Llamar cuando un enemigo que estaba atacando muere
     public void EnemigoAtacandoMuerto()
     {
         enemigosActivosAtacando = Mathf.Max(0, enemigosActivosAtacando - 1);
 
         if (enemigosActivosAtacando == 0)
         {
-            reduccionPausada = true; // Pausamos la reducción porque no hay enemigos atacando
+            reduccionPausada = true;
+        }
+    }
+
+    float GetDañoRonda()
+    {
+        return rondaActual switch
+        {
+            1 => dañoRonda1,
+            2 => dañoRonda2,
+            3 => dañoRonda3,
+            _ => dañoRonda1
+        };
+    }
+
+    float GetTiempoEsperaRonda()
+    {
+        return rondaActual switch
+        {
+            1 => tiempoEsperaRonda1,
+            2 => tiempoEsperaRonda2,
+            3 => tiempoEsperaRonda3,
+            _ => tiempoEsperaRonda1
+        };
+    }
+
+    float GetTiempoReduccion()
+    {
+        return rondaActual switch
+        {
+            2 => tiempoBaseReduccion / 2f,
+            3 => tiempoBaseReduccion / 5f,
+            _ => tiempoBaseReduccion
+        };
+    }
+
+    //  Struct para llevar el control temporal de los enemigos
+    private class EnemigoEnEspera
+    {
+        public GameObject enemigo;
+        public float expiraEn;
+
+        public EnemigoEnEspera(GameObject e, float tiempo)
+        {
+            enemigo = e;
+            expiraEn = tiempo;
         }
     }
 }
