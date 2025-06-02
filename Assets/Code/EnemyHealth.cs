@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyHealth : MonoBehaviour
 {
     public ParticleSystem onDeathParticles; // Referencia al sistema de partículas hijo
-    public float effectDuration = 1f;       // Tiempo de vida del sistema de partículas
+    public float effectDuration = 3f;       // Tiempo de vida del sistema de partículas (independiente del enemigo)
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -16,19 +16,22 @@ public class EnemyHealth : MonoBehaviour
             {
                 Debug.Log("Enemigo destruido, colores coinciden");
 
-                // Si se asignó el sistema de partículas
+                // Destruye el arma inmediatamente
+                Destroy(collision.gameObject);
+
+                // Activa y reproduce partículas
                 if (onDeathParticles != null)
                 {
-                    onDeathParticles.gameObject.SetActive(true); // Asegura que esté activo
-                    onDeathParticles.Play();                     // Reproduce el efecto
-
-                    // Lo separamos del enemigo antes de destruirlo
+                    onDeathParticles.gameObject.SetActive(true);
                     onDeathParticles.transform.parent = null;
+                    onDeathParticles.Play();
+
+                    // Las partículas se eliminan solas después de unos segundos
                     Destroy(onDeathParticles.gameObject, effectDuration);
                 }
 
-                Destroy(gameObject); // Destruye el enemigo
-                Destroy(collision.gameObject); // Destruye el objeto que lo golpeó
+                // Destruye el enemigo inmediatamente
+                Destroy(gameObject);
             }
             else
             {

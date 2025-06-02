@@ -885,7 +885,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5351412600285247691, guid: fdfb5125e14b720408f2bbcc2a954543, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5351412600303428009, guid: fdfb5125e14b720408f2bbcc2a954543, type: 3}
       propertyPath: playOnAwake
