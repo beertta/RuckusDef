@@ -2841,7 +2841,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &321999965
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2851,15 +2851,15 @@ RectTransform:
   m_GameObject: {fileID: 321999964}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 11.573077, y: 11.573077, z: 11.573077}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1451086788}
+  m_Father: {fileID: 1347796810}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 929, y: 540}
-  m_SizeDelta: {x: 1640, y: 979}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &321999966
 MonoBehaviour:
@@ -5070,6 +5070,9 @@ MonoBehaviour:
   formaCirculo: {fileID: 1514850476}
   formaTriangulo: {fileID: 110657358}
   formaRombo: {fileID: 1449666756}
+  round1Panel: {fileID: 1615382134}
+  round2Panel: {fileID: 507986629}
+  finalBossPanel: {fileID: 1987662398}
   spawnPoint: {fileID: 1493292351}
   spawnInterval: 2
   waypoints:
@@ -10036,6 +10039,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 321999965}
   - {fileID: 1615382135}
   - {fileID: 507986630}
   - {fileID: 1987662399}
@@ -10922,7 +10926,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 522242313}
-  - {fileID: 321999965}
   - {fileID: 1473618100}
   - {fileID: 57348516}
   - {fileID: 222313940}
@@ -15238,7 +15241,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vidaMaxima: 100
   vidaActual: 100
-  "da\xF1oRonda1": 2
+  "da\xF1oRonda1": 30
   "da\xF1oRonda2": 5
   "da\xF1oRonda3": 8
   tiempoBaseReduccion: 1
@@ -15247,6 +15250,8 @@ MonoBehaviour:
   tiempoEsperaRonda3: 1
   rondaActual: 1
   barraDeVidaUI: {fileID: 590590569}
+  gameOverPanel: {fileID: 321999964}
+  enemySpawner: {fileID: 572869806}
 --- !u!1001 &2021622087
 PrefabInstance:
   m_ObjectHideFlags: 0

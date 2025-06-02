@@ -27,13 +27,18 @@ public class BarraDeVida : MonoBehaviour
     [Header("Ronda actual (1 a 3)")]
     public int rondaActual = 1;
 
-    [Header("UI")]
+    [Header("Referencias externas")]
     public Image barraDeVidaUI;
+    public GameObject gameOverPanel;
+    public EnemySpawner enemySpawner; // Referencia a EnemySpawner
 
     private int enemigosActivosAtacando = 0;
     private Coroutine rutinaReducirVida;
     private bool esperandoReducirVida = false;
     private bool reduccionPausada = true;
+    private bool vidaAgotada = false;
+
+
 
     private List<EnemigoEnEspera> enemigosEnEspera = new List<EnemigoEnEspera>();
 
@@ -42,6 +47,10 @@ public class BarraDeVida : MonoBehaviour
         Instance = this;
         vidaActual = vidaMaxima;
         ActualizarBarra();
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
+
         EnemyMovement.OnEnemigoLlegoAlFinal += EnemigoLlegadoAlFinal;
     }
 
@@ -58,23 +67,17 @@ public class BarraDeVida : MonoBehaviour
         enemigosActivosAtacando++;
 
         if (rutinaReducirVida == null)
-        {
             rutinaReducirVida = StartCoroutine(ReducirVida());
-        }
 
         if (reduccionPausada)
-        {
             StartCoroutine(EsperarYReanudar());
-        }
     }
 
     IEnumerator EsperarYReanudar()
     {
         esperandoReducirVida = true;
-
         float tiempoEspera = GetTiempoEsperaRonda();
         yield return new WaitForSeconds(tiempoEspera);
-
         esperandoReducirVida = false;
         reduccionPausada = false;
     }
@@ -94,9 +97,10 @@ public class BarraDeVida : MonoBehaviour
             vidaActual = Mathf.Clamp(vidaActual, 0f, vidaMaxima);
             ActualizarBarra();
 
-            if (vidaActual <= 0)
+            if (vidaActual <= 0 && !vidaAgotada)
             {
-                Debug.Log("¡Vida agotada!");
+                vidaAgotada = true;
+                StartCoroutine(ReiniciarPartida());
                 yield break;
             }
 
@@ -105,22 +109,46 @@ public class BarraDeVida : MonoBehaviour
         }
     }
 
+    IEnumerator ReiniciarPartida()
+    {
+        Debug.Log("Vida agotada. Reiniciando...");
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+
+        yield return new WaitForSeconds(3f);
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
+
+        // Resetear vida y variables
+        vidaActual = vidaMaxima;
+        ActualizarBarra();
+        rondaActual = 1;
+        enemigosActivosAtacando = 0;
+        reduccionPausada = true;
+        esperandoReducirVida = false;
+        vidaAgotada = false;
+        enemigosEnEspera.Clear();
+        rutinaReducirVida = null;
+
+        // Notificar al EnemySpawner que reinicie
+        if (enemySpawner != null)
+            enemySpawner.ReiniciarPartida();
+    }
+
     void ActualizarBarra()
     {
         if (barraDeVidaUI != null)
-        {
             barraDeVidaUI.fillAmount = vidaActual / vidaMaxima;
-        }
     }
 
-    //  Este lo llama el enemigo al instanciarse (por ejemplo en Start del enemigo)
     public void RegistrarEnemigoEnEspera(GameObject enemigo)
     {
         float tiempo = GetTiempoEsperaRonda();
         enemigosEnEspera.Add(new EnemigoEnEspera(enemigo, Time.time + tiempo));
     }
 
-    // Este lo llama el enemigo cuando muere antes de atacar
     public void EnemigoMuertoAntesDeAtacar(GameObject enemigo)
     {
         var item = enemigosEnEspera.Find(e => e.enemigo == enemigo);
@@ -139,9 +167,7 @@ public class BarraDeVida : MonoBehaviour
         enemigosActivosAtacando = Mathf.Max(0, enemigosActivosAtacando - 1);
 
         if (enemigosActivosAtacando == 0)
-        {
             reduccionPausada = true;
-        }
     }
 
     float GetDañoRonda()
@@ -176,7 +202,6 @@ public class BarraDeVida : MonoBehaviour
         };
     }
 
-    //  Struct para llevar el control temporal de los enemigos
     private class EnemigoEnEspera
     {
         public GameObject enemigo;

@@ -45,7 +45,6 @@ public class EnemySpawner : MonoBehaviour
         DesactivarPanelesDeRonda();
     }
 
-    // Llamar desde VRPanelManager para empezar las rondas
     public void StartSpawning()
     {
         StartCoroutine(RunGamePhases());
@@ -64,10 +63,12 @@ public class EnemySpawner : MonoBehaviour
             SpawnEnemigo(color);
         }
 
+        yield return EsperarHastaQueNoHayaEnemigo();
+
         // ROUND 2
         yield return StartCoroutine(ActivarPanelYEsperar(round2Panel));
 
-        for (int i = 0; i < 7; i++) // Cambia la cantidad de enemigos para round 2 si quieres
+        for (int i = 0; i < 2; i++)
         {
             yield return EsperarHastaQueNoHayaEnemigo();
             yield return new WaitForSeconds(spawnInterval);
@@ -79,6 +80,8 @@ public class EnemySpawner : MonoBehaviour
 
             SpawnEnemigo(selectedColor);
         }
+
+        yield return EsperarHastaQueNoHayaEnemigo();
 
         // FINAL BOSS
         yield return StartCoroutine(ActivarPanelYEsperar(finalBossPanel));
@@ -92,12 +95,38 @@ public class EnemySpawner : MonoBehaviour
     IEnumerator ActivarPanelYEsperar(GameObject panel)
     {
         if (panel != null)
+        {
             panel.SetActive(true);
+            CanvasGroup cg = panel.GetComponent<CanvasGroup>();
+            if (cg != null)
+            {
+                yield return StartCoroutine(FadeCanvasGroup(cg, 0f, 1f, 0.5f));
+            }
+        }
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(4f);
 
         if (panel != null)
+        {
+            CanvasGroup cg = panel.GetComponent<CanvasGroup>();
+            if (cg != null)
+            {
+                yield return StartCoroutine(FadeCanvasGroup(cg, 1f, 0f, 0.5f));
+            }
             panel.SetActive(false);
+        }
+    }
+
+    IEnumerator FadeCanvasGroup(CanvasGroup cg, float start, float end, float duration)
+    {
+        float t = 0f;
+        while (t < duration)
+        {
+            cg.alpha = Mathf.Lerp(start, end, t / duration);
+            t += Time.deltaTime;
+            yield return null;
+        }
+        cg.alpha = end;
     }
 
     void SpawnEnemigo(string color)
@@ -182,5 +211,34 @@ public class EnemySpawner : MonoBehaviour
         if (round1Panel != null) round1Panel.SetActive(false);
         if (round2Panel != null) round2Panel.SetActive(false);
         if (finalBossPanel != null) finalBossPanel.SetActive(false);
+    }
+
+    // MÉTODO DE REINICIO TOTAL
+    public void ReiniciarPartida()
+    {
+        StopAllCoroutines();
+        DesactivarFormas();
+        DesactivarPanelesDeRonda();
+
+        if (currentEnemy != null)
+        {
+            Destroy(currentEnemy);
+            currentEnemy = null;
+        }
+
+        // Destruir enemigos de todos los colores
+        string[] tags = { "Red", "Green", "Blue", "Yellow" };
+        foreach (string tag in tags)
+        {
+            GameObject[] enemigos = GameObject.FindGameObjectsWithTag(tag);
+            foreach (GameObject enemigo in enemigos)
+            {
+                Destroy(enemigo);
+            }
+        }
+
+        lastColor = "";
+
+        StartCoroutine(RunGamePhases());
     }
 }
