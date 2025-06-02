@@ -4562,7 +4562,7 @@ MonoBehaviour:
     - {fileID: 1402318191}
     - {fileID: 1215476672}
     - {fileID: 874994831}
-    objetoAInstanciar: {fileID: 3593376958395838621, guid: 3bea97c096efd5f4483db66ccea7292b, type: 3}
+    objetoAInstanciar: {fileID: 8444607668643361702, guid: 5992f35a42c916a4aa51e98fc55bcf2e, type: 3}
     puntoSpawn: {fileID: 2042278728}
     completada: 0
   - tipo: 2
@@ -4579,7 +4579,7 @@ MonoBehaviour:
     - {fileID: 1971408149}
     - {fileID: 109089487}
     - {fileID: 917098091}
-    objetoAInstanciar: {fileID: 3540091483941206835, guid: ec65f7e7380c2ce49add8e4a4e01cb4d, type: 3}
+    objetoAInstanciar: {fileID: 4196067394196279494, guid: 1ca722fe1b22bf44191c755f1fd1e96b, type: 3}
     puntoSpawn: {fileID: 2042278728}
     completada: 0
   enemySpawner: {fileID: 0}
