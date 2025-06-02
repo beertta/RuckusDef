@@ -2997,6 +2997,7 @@ MonoBehaviour:
   countdownText1: {fileID: 463895057}
   countdownText2: {fileID: 2309050}
   countdownText3: {fileID: 747148012}
+  enemySpawner: {fileID: 572869806}
 --- !u!4 &336189652
 Transform:
   m_ObjectHideFlags: 0
@@ -10766,7 +10767,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1451086787}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -11.676}
+  m_LocalPosition: {x: 0, y: 0, z: -8.68}
   m_LocalScale: {x: 0.0015216195, y: 0.0015216195, z: 0.0015216195}
   m_ConstrainProportionsScale: 0
   m_Children:
