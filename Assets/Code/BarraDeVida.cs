@@ -38,8 +38,6 @@ public class BarraDeVida : MonoBehaviour
     private bool reduccionPausada = true;
     private bool vidaAgotada = false;
 
-
-
     private List<EnemigoEnEspera> enemigosEnEspera = new List<EnemigoEnEspera>();
 
     void Start()
@@ -109,7 +107,14 @@ public class BarraDeVida : MonoBehaviour
         }
     }
 
-    IEnumerator ReiniciarPartida()
+    // Nuevo método público para reiniciar desde fuera
+    public void ReiniciarPartidaPublica()
+    {
+        StartCoroutine(ReiniciarPartida());
+    }
+
+    // Ahora privado para controlar el acceso
+    private IEnumerator ReiniciarPartida()
     {
         Debug.Log("Vida agotada. Reiniciando...");
 
