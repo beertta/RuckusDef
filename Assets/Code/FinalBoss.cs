@@ -1,30 +1,66 @@
-using UnityEngine;
+//using UnityEngine;
 
-public class FinalBoss : MonoBehaviour
-{
-    public bool esPrimerBoss = false;  // Solo indica si es el primero
-    public EnemySpawner spawner;
+//public class FinalBoss : MonoBehaviour
+//{
+//    public string colorEsperado;  // Color que debe recibir el arma para recibir daño
+//    public bool esPrimerBoss = false;
+//    public EnemySpawner spawner;
 
-    private bool haSidoDerrotado = false;
+//    public GameObject panelFinJuego; // Panel de fin de juego (poner en inspector)
 
-    public void IniciarBoss()
-    {
-        haSidoDerrotado = false;
-    }
+//    private int golpesRecibidos = 0;
+//    private int golpesParaDerrotar = 4;
+//    private bool haSidoDerrotado = false;
 
-    public void RecibirDanio()
-    {
-        if (haSidoDerrotado) return;
+//    public void IniciarBoss()
+//    {
+//        haSidoDerrotado = false;
+//        golpesRecibidos = 0;
+//    }
 
-        haSidoDerrotado = true;
+//    private void OnCollisionEnter(Collision collision)
+//    {
+//        if (collision.gameObject.CompareTag("Red") ||
+//            collision.gameObject.CompareTag("Green") ||
+//            collision.gameObject.CompareTag("Blue") ||
+//            collision.gameObject.CompareTag("Yellow"))
+//        {
+//            if (collision.gameObject.tag == colorEsperado)
+//            {
+//                Debug.Log("Final Boss golpeado con color correcto: " + colorEsperado);
 
-        // Notificamos al spawner tras morir (sin animación ni delay)
-        if (spawner != null)
-        {
-            spawner.OnEnemyDestroyed();
-            spawner.OnFinalBossKilled(gameObject.tag);
-        }
+//                // Destruye el arma
+//                Destroy(collision.gameObject);
 
-        Destroy(gameObject); // Se destruye directamente
-    }
-}
+//                RecibirDanio();
+//            }
+//            else
+//            {
+//                Debug.Log("Final Boss recibió un golpe de color incorrecto.");
+//            }
+//        }
+//    }
+
+//    private void RecibirDanio()
+//    {
+//        if (haSidoDerrotado) return;
+
+//        golpesRecibidos++;
+
+//        if (golpesRecibidos >= golpesParaDerrotar)
+//        {
+//            haSidoDerrotado = true;
+
+//            if (spawner != null)
+//            {
+//                spawner.OnEnemyDestroyed();
+//                spawner.OnFinalBossKilled(colorEsperado);
+//            }
+
+//            if (panelFinJuego != null)
+//                panelFinJuego.SetActive(true);
+
+//            Destroy(gameObject);
+//        }
+//    }
+//}

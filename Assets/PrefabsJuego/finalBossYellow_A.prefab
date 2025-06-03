@@ -397,10 +397,9 @@ GameObject:
   - component: {fileID: 1608752609859949193}
   - component: {fileID: -2922207349153363025}
   - component: {fileID: 205526552023992665}
-  - component: {fileID: 6618899491882033422}
-  - component: {fileID: 4443457820391795415}
   - component: {fileID: -3044175110008955063}
   - component: {fileID: -4313045438268411334}
+  - component: {fileID: -3249892970080061694}
   m_Layer: 0
   m_Name: finalBossYellow_A
   m_TagString: Yellow
@@ -490,34 +489,6 @@ CapsuleCollider:
   m_Height: 3.528298
   m_Direction: 1
   m_Center: {x: -0.0029204565, y: 1.2641486, z: 0}
---- !u!114 &6618899491882033422
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5474287532514660937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 978984b4b36a55342bc3d7d4622544d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  esPrimerBoss: 1
-  spawner: {fileID: 0}
---- !u!114 &4443457820391795415
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5474287532514660937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a0c2df9f4951f4418e0095d6913668b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onDeathParticles: {fileID: 224091974104314707, guid: c1c3c27426dfeae42ade88a13d015d2e, type: 3}
-  effectDuration: 3
 --- !u!82 &-3044175110008955063
 AudioSource:
   m_ObjectHideFlags: 0
@@ -710,6 +681,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-3249892970080061694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5474287532514660937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a0c2df9f4951f4418e0095d6913668b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onDeathParticles: {fileID: 5351412600303428011, guid: fdfb5125e14b720408f2bbcc2a954543, type: 3}
+  effectDuration: 5
 --- !u!1 &5738088456474275949
 GameObject:
   m_ObjectHideFlags: 0
